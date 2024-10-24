@@ -1,0 +1,47 @@
+name: 🚀 CI/CD for Spring Boot with Docker on EC2
+
+on:
+  push:
+    branches:
+      - local
+      - qa
+      - real
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ✅Checkout
+      uses: actions/checkout@v4
+
+    - name: 💌Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: ⭕Grant execute permission for gradlew
+      run: chmod +x gradlew
+      shell: bash
+
+    - name: 🔺Build with Gradle
+      run: ./gradlew clean build -x test
+      shell: bash
+
+    # 환경에 따라 다른 docker-compose 파일 사용
+    - name: 🌎 SSH into EC2 and deploy
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # github.ref: 현재 워크플로우가 실행되는 git브랜치. 각각의 docker-compose 파일 사용
+          if [ "${{ github.ref }}" == "refs/heads/local" ]; then
+            docker-compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local up -d --build spring-server
+          elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
+            docker-compose -f docker-compose.yml -f docker-compose.qa.yml --env-file .env.qa up -d --build spring-server
+          elif [ "${{ github.ref }}" == "refs/heads/real" ]; then
+            docker-compose -f docker-compose.yml -f docker-compose.real.yml --env-file .env.real up -d --build spring-server
+          fi
