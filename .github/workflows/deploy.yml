@@ -40,14 +40,20 @@ jobs:
           # 디렉토리 변경
           cd /home/ubuntu/docker_setup
 
+          # MySQL 실행
+          docker-compose -f docker-compose-mysql.yml up -d
+          
           # 현재 브랜치에 따라 Docker 이미지 빌드
           if [ "${{ github.ref }}" == "refs/heads/local" ]; then
-            docker build -t myspring_img_local .
-            docker-compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local up -d --build spring-server
+            docker build -t myspring_img_local . --no-cache
+            docker-compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local -p local down
+            docker-compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local -p local up -d
           elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
-            docker build -t myspring_img_qa .
-            docker-compose -f docker-compose.yml -f docker-compose.qa.yml --env-file .env.qa up -d --build spring-server
+            docker build -t myspring_img_qa . --no-cache
+            docker-compose -f docker-compose.yml -f docker-compose.qa.yml --env-file .env.qa -p qa down
+            docker-compose -f docker-compose.yml -f docker-compose.qa.yml --env-file .env.qa -p qa up -d
           elif [ "${{ github.ref }}" == "refs/heads/real" ]; then
-            docker build -t myspring_img_real .
-            docker-compose -f docker-compose.yml -f docker-compose.real.yml --env-file .env.real up -d --build spring-server
+            docker build -t myspring_img_real . --no-cache
+            docker-compose -f docker-compose.yml -f docker-compose.real.yml --env-file .env.real -p real down
+            docker-compose -f docker-compose.yml -f docker-compose.real.yml --env-file .env.real -p real up -d
           fi
