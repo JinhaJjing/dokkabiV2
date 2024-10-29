@@ -39,11 +39,15 @@ jobs:
         script: |
           # 디렉토리 변경
           cd /home/ubuntu/docker_setup
-          # github.ref: 현재 워크플로우가 실행되는 git브랜치. 각각의 docker-compose 파일 사용
+
+          # 현재 브랜치에 따라 Docker 이미지 빌드
           if [ "${{ github.ref }}" == "refs/heads/local" ]; then
+            docker build -t myspring_img_local .
             docker-compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local up -d --build spring-server
           elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
+            docker build -t myspring_img_qa .
             docker-compose -f docker-compose.yml -f docker-compose.qa.yml --env-file .env.qa up -d --build spring-server
           elif [ "${{ github.ref }}" == "refs/heads/real" ]; then
+            docker build -t myspring_img_real .
             docker-compose -f docker-compose.yml -f docker-compose.real.yml --env-file .env.real up -d --build spring-server
           fi
