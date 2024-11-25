@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: dokkabiV2
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            redirect-uri: ${OAUTH_GOOGLE_REDIRECT_URI}
+            client-name: Google
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+    defaultModelsExpandDepth: -1
+  paths-to-match:
+    - /**
+    -
+logging:
+  config: classpath:logback-spring.xml
+
+jwt:
+  secret: ${JWT_SECRET}

@@ -22,9 +22,24 @@
         </filter>
     </appender>
 
+    <property name="LOG_PATH" value="/logs/spring-container"/> <!--docker 셋팅된 로그 마운트 경로랑 일치-->
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 로그 파일을 일자별로 생성 -->
+            <fileNamePattern>${LOG_PATH}/spring-%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>365</maxHistory> <!-- 로그를 보관할 일 수 -->
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss, Asia/Seoul} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <root>
         <level value="INFO" />
         <appender-ref ref="ASYNC_SLACK" />
         <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
     </root>
+
 </configuration>
