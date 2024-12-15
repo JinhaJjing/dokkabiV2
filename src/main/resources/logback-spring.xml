@@ -4,21 +4,43 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     <logger name="org.hibernate.SQL_SLOW" level="WARN"/>
 
-    <appender name="SLACK" class="com.github.maricn.logback.SlackAppender">
+    <!-- INFO 로그용 Slack Appender -->
+    <appender name="SLACK_INFO" class="com.github.maricn.logback.SlackAppender">
         <webhookUri>${SLACK_WEBHOOK_URL}</webhookUri>
-        <channel>server</channel>
+        <channel>#v2서버로그</channel>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>[%d{yyyy-MM-dd HH:mm:ss}] %-5level - %msg%n</pattern>
         </layout>
         <username>서버로그알리미</username>
+        <iconEmoji>:information_source:</iconEmoji>
+        <colorCoding>true</colorCoding>
+    </appender>
+
+    <!-- ERROR 로그용 Slack Appender -->
+    <appender name="SLACK_ERROR" class="com.github.maricn.logback.SlackAppender">
+        <webhookUri>${SLACK_WEBHOOK_URL}</webhookUri>
+        <channel>#v2서버에러</channel>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss}] %-5level - %msg%n</pattern>
+        </layout>
+        <username>에러로그알리미</username>
         <iconEmoji>:fire:</iconEmoji>
         <colorCoding>true</colorCoding>
     </appender>
 
-    <appender name="ASYNC_SLACK" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="SLACK" />
+    <!-- Async Appender for INFO -->
+    <appender name="ASYNC_SLACK_INFO" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK_INFO" />
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
+        </filter>
+    </appender>
+
+    <!-- Async Appender for ERROR -->
+    <appender name="ASYNC_SLACK_ERROR" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK_ERROR" />
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
         </filter>
     </appender>
 
@@ -35,11 +57,12 @@
         </encoder>
     </appender>
 
+    <!-- Root Logger 설정 -->
     <root>
         <level value="INFO" />
-        <appender-ref ref="ASYNC_SLACK" />
+        <appender-ref ref="ASYNC_SLACK_INFO" />
+        <appender-ref ref="ASYNC_SLACK_ERROR" />
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>
-
 </configuration>
