@@ -47,9 +47,14 @@ public class SecurityConfig {
                 .addFilterBefore(new CorsFilter(corsConfigurationSource()), UsernamePasswordAuthenticationFilter.class) // CORS 필터를 가장 먼저 처리
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api-docs/**").permitAll() // Swagger 접근 허용
-                        .requestMatchers("/test").permitAll() // Swagger 접근 허용
+                        .requestMatchers("/test").permitAll()
+                        .requestMatchers("/test2").permitAll()
                         .requestMatchers("/token").permitAll() // 토큰 생성 API 접근 허용
+                        .requestMatchers("/login").permitAll() // login 요청 허용
                         .anyRequest().authenticated() // 다른 요청은 인증 필요
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("/token") // 로그인 성공 시 /token 엔드포인트로 이동
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
         ;
