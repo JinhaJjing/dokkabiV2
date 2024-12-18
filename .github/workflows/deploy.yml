@@ -38,7 +38,7 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           # 디렉토리 변경
-          cd /home/ubuntu/docker_setup
+          cd /home/jinha/docker_setup
 
           # MySQL 실행
           docker-compose -f docker-compose-mysql.yml up -d

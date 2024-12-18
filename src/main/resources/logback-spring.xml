@@ -7,11 +7,11 @@
     <!-- INFO 로그용 Slack Appender -->
     <appender name="SLACK_INFO" class="com.github.maricn.logback.SlackAppender">
         <webhookUri>${SLACK_WEBHOOK_URL}</webhookUri>
-        <channel>#v2서버로그</channel>
+        <channel>#v2서버접근로그</channel>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>[%d{yyyy-MM-dd HH:mm:ss}] %-5level - %msg%n</pattern>
         </layout>
-        <username>서버로그알리미</username>
+        <username>접근로그알리미</username>
         <iconEmoji>:information_source:</iconEmoji>
         <colorCoding>true</colorCoding>
     </appender>
@@ -19,7 +19,7 @@
     <!-- ERROR 로그용 Slack Appender -->
     <appender name="SLACK_ERROR" class="com.github.maricn.logback.SlackAppender">
         <webhookUri>${SLACK_WEBHOOK_URL}</webhookUri>
-        <channel>#v2서버에러</channel>
+        <channel>#v2서버에러로그</channel>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>[%d{yyyy-MM-dd HH:mm:ss}] %-5level - %msg%n</pattern>
         </layout>
