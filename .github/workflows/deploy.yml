@@ -29,17 +29,23 @@ jobs:
       run: ./gradlew clean build -x test
       shell: bash
 
+    - name: 🚀Upload JAR file to EC2
+      uses: appleboy/scp-action@v0.1.8
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: build/libs/dokkabiV2-0.0.1-SNAPSHOT.jar
+        target: /home/jinha/docker_setup/dokkabiV2-${{ github.ref_name }}.jar
+
     # 환경에 따라 다른 docker-compose 파일 사용
-    - name: 🌎Upload and Deploy JAR file to EC2
+    - name: 🌎SSH into EC2 and deploy
       uses: appleboy/ssh-action@v0.1.8
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # JAR 파일 업로드
-          scp -i ~/.ssh/id_rsa build/libs/dokkabiV2-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/jinha/docker_setup/dokkabiV2-${{ github.ref_name }}.jar
-
           # 디렉토리 변경
           cd /home/jinha/docker_setup
 
