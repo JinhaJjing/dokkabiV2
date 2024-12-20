@@ -37,3 +37,6 @@ logging:
 
 jwt:
   secret: ${JWT_SECRET}
+
+google:
+  sheetId: ${GOOGLE_SHEET}

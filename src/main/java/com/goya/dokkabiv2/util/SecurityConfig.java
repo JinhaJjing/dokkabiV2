@@ -1,5 +1,6 @@
 package com.goya.dokkabiv2.util;
 
+import com.goya.dokkabiv2.service.PrincipalOAuth2DetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,11 +47,7 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new CorsFilter(corsConfigurationSource()), UsernamePasswordAuthenticationFilter.class) // CORS 필터를 가장 먼저 처리
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api-docs/**").permitAll() // Swagger 접근 허용
-                        .requestMatchers("/test").permitAll()
-                        .requestMatchers("/test2").permitAll()
-                        .requestMatchers("/token").permitAll() // 토큰 생성 API 접근 허용
-                        .requestMatchers("/login").permitAll() // login 요청 허용
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated() // 다른 요청은 인증 필요
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -61,4 +58,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }

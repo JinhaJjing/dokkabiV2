@@ -3,15 +3,32 @@ package com.goya.dokkabiv2.util;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+@Component
 public class GoogleSheetParser {
 
-    private final Sheets sheetsService;
+    @Value("classpath:google_spread_sheet_key2.json") // classpath에서 파일 로드
+    private Resource credentialsResource;
 
-    public GoogleSheetParser(GoogleCredential credential) throws IOException {
+    private Sheets sheetsService;
+
+    @PostConstruct
+    public void init() throws IOException {
+        // 리소스에서 InputStream 가져오기
+        InputStream inputStream = credentialsResource.getInputStream();
+
+        // GoogleCredential 객체 생성
+        GoogleCredential credential = GoogleCredential.fromStream(inputStream)
+                .createScoped(List.of("https://www.googleapis.com/auth/spreadsheets"));
+
         this.sheetsService = new Sheets.Builder(
                 credential.getTransport(),
                 credential.getJsonFactory(),
