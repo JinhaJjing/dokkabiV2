@@ -30,7 +30,7 @@ jobs:
       shell: bash
 
     - name: 🚀Upload JAR file to EC2
-      uses: appleboy/scp-action@v0.1.8
+      uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
@@ -40,7 +40,7 @@ jobs:
 
     # 환경에 따라 다른 docker-compose 파일 사용
     - name: 🌎SSH into EC2 and deploy
-      uses: appleboy/ssh-action@v0.1.7
+      uses: appleboy/ssh-action@v0.1.8
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
