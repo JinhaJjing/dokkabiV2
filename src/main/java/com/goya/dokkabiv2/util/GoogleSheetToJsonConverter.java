@@ -3,6 +3,8 @@ package com.goya.dokkabiv2.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.goya.dokkabiv2.domain.MapData;
 import com.goya.dokkabiv2.domain.QuestData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @Component
 public class GoogleSheetToJsonConverter implements CommandLineRunner {
+    private static final Logger log = LoggerFactory.getLogger(GoogleSheetToJsonConverter.class);
     @Value("${google.sheetId}")
     private String spreadsheetId;
 
@@ -26,20 +29,26 @@ public class GoogleSheetToJsonConverter implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // 시트 데이터를 객체로 변환하고 JSON 파일로 저장
+        // 시트 데이터를 객체로 변환하고 data 폴더에 JSON 파일로 저장
         convertAndSaveSheetData("Quest", QuestData.class, "quest_data.json");
         convertAndSaveSheetData("Map", MapData.class, "map_data.json");
     }
 
     private <T> void convertAndSaveSheetData(String sheetName, Class<T> dataClass, String outputFileName) {
+        File jsonFile = new File("src/main/resources/data/" + outputFileName);
+        if (jsonFile.exists()) {
+            log.info("{} 파일이 이미 존재합니다. 생성을 생략합니다.", outputFileName);
+            return;
+        }
+        log.info("{} 파일이 존재하지 않아 생성합니다.", outputFileName);
+
         try {
             List<List<Object>> sheetData = parser.getSheetData(spreadsheetId, sheetName);
             List<T> dataList = parseSheetData(dataClass, sheetData);
             saveAsJson(dataList, outputFileName);
-            System.out.println(sheetName + " data successfully saved to " + outputFileName);
+            log.info("{} 시트의 데이터가 {} 파일에 저장되었습니다.", sheetName, outputFileName);
         } catch (Exception e) {
-            System.err.println("Error processing sheet: " + sheetName);
-            e.printStackTrace();
+            log.error("Failed to convert sheet data to JSON", e);
         }
     }
 
@@ -79,6 +88,6 @@ public class GoogleSheetToJsonConverter implements CommandLineRunner {
     // 객체를 JSON 파일로 저장
     public <T> void saveAsJson(List<T> data, String filePath) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new File(filePath), data);
+        mapper.writeValue(new File("src/main/resources/data/" + filePath), data);
     }
 }
