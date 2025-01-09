@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +36,6 @@ public class GoogleSheetToJsonConverter implements CommandLineRunner {
     }
 
     private <T> void convertAndSaveSheetData(String sheetName, Class<T> dataClass, String outputFileName) {
-        File jsonFile = new File("src/main/resources/data/" + outputFileName);
-        if (jsonFile.exists()) {
-            log.info("{} 파일이 이미 존재합니다. 생성을 생략합니다.", outputFileName);
-            return;
-        }
-        log.info("{} 파일이 존재하지 않아 생성합니다.", outputFileName);
-
         try {
             List<List<Object>> sheetData = parser.getSheetData(spreadsheetId, sheetName);
             List<T> dataList = parseSheetData(dataClass, sheetData);
@@ -52,7 +46,6 @@ public class GoogleSheetToJsonConverter implements CommandLineRunner {
         }
     }
 
-    // 데이터를 객체로 변환
     public <T> List<T> parseSheetData(Class<T> clazz, List<List<Object>> sheetData) throws Exception {
         if (sheetData == null || sheetData.isEmpty()) {
             throw new IllegalArgumentException("시트 데이터가 비어있습니다.");
@@ -85,9 +78,36 @@ public class GoogleSheetToJsonConverter implements CommandLineRunner {
         return result;
     }
 
-    // 객체를 JSON 파일로 저장
-    public <T> void saveAsJson(List<T> data, String filePath) throws IOException {
+    public <T> void saveAsJson(List<T> data, String fileName) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new File("src/main/resources/data/" + filePath), data);
+        Path filePath = Paths.get("/app/data", fileName);
+        // JSON으로 변환 후 파일 저장
+        mapper.writeValue(filePath.toFile(), data);
+    }
+
+    public <T> List<T> readAndPrintJson(String filePath, Class<T> dataClass) {
+        try {
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("app/data/" + filePath);
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(inputStream, mapper.getTypeFactory().constructCollectionType(List.class, dataClass));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public <T> void updateJsonIfDataChanged(String filePath, List<T> newData, Class<T> dataClass) {
+        try {
+            List<T> existingData = readAndPrintJson(filePath, dataClass);
+            if (!existingData.equals(newData)) {
+                saveAsJson(newData, filePath);
+                log.info("{} 파일이 업데이트되었습니다.", filePath);
+            } else {
+                log.info("{} 파일의 데이터가 변경되지 않았습니다.", filePath);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
