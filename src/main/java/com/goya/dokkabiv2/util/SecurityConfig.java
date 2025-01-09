@@ -15,8 +15,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.Arrays;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -27,7 +25,7 @@ public class SecurityConfig {
         // CORS 설정
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("*"); // 허용할 Origin
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // 허용할 HTTP 메서드
+        corsConfiguration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
         corsConfiguration.addAllowedHeader("*"); // 허용할 헤더
         corsConfiguration.setAllowCredentials(true); // 자격 증명 허용
 
@@ -47,8 +45,8 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new CorsFilter(corsConfigurationSource()), UsernamePasswordAuthenticationFilter.class) // CORS 필터를 가장 먼저 처리
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/**").permitAll()
-                        .anyRequest().authenticated() // 다른 요청은 인증 필요
+                        .requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/token") // 로그인 성공 시 /token 엔드포인트로 이동
