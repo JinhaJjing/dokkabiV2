@@ -87,9 +87,8 @@ public class GoogleSheetToJsonConverter implements CommandLineRunner {
 
     public <T> void saveAsJson(List<T> data, String fileName) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        Path filePath = Paths.get("/app/data", fileName);
-        // JSON으로 변환 후 파일 저장
-        mapper.writeValue(filePath.toFile(), data);
+        Path filePath = Paths.get("data", fileName);
+        mapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath.toString()), data);
     }
 
     public <T> List<T> readAndPrintJson(String filePath, Class<T> dataClass) {
