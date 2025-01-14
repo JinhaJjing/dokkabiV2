@@ -71,15 +71,18 @@ jobs:
           
           # 현재 브랜치에 따라 Docker 이미지 빌드
           if [ "${{ github.ref }}" == "refs/heads/local" ]; then
-            docker build --build-arg JAR_FILE=dokkabiV2-local.jar -t dokkabi-v2-local .
+            docker build --build-arg JAR_FILE=dokkabiV2-local.jar -t dokkabi-v2-local . --no-cache
             docker-compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local -p local down
             docker-compose -f docker-compose.yml -f docker-compose.local.yml --env-file .env.local -p local up -d
           elif [ "${{ github.ref }}" == "refs/heads/qa" ]; then
-            docker build --build-arg JAR_FILE=dokkabiV2-qa.jar -t dokkabi-v2-qa .
+            docker build --build-arg JAR_FILE=dokkabiV2-qa.jar -t dokkabi-v2-qa . --no-cache
             docker-compose -f docker-compose.yml -f docker-compose.qa.yml --env-file .env.qa -p qa down
             docker-compose -f docker-compose.yml -f docker-compose.qa.yml --env-file .env.qa -p qa up -d
           elif [ "${{ github.ref }}" == "refs/heads/real" ]; then
-            docker build --build-arg JAR_FILE=dokkabiV2-real.jar -t dokkabi-v2-real .
+            docker build --build-arg JAR_FILE=dokkabiV2-real.jar -t dokkabi-v2-real . --no-cache
             docker-compose -f docker-compose.yml -f docker-compose.real.yml --env-file .env.real -p real down
             docker-compose -f docker-compose.yml -f docker-compose.real.yml --env-file .env.real -p real up -d
           fi
+          
+          # 현재 실행 중인 컨테이너에서 사용되지 않는 이미지를 삭제
+          docker image prune -f
