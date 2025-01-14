@@ -1,6 +1,11 @@
 package com.goya.dokkabiv2.domain;
 
+import lombok.Data;
+import lombok.Getter;
+
+@Data
+@Getter
 public class MapData {
-    public String Index;
-    public String MapID;
+    public String index;
+    public String mapID;
 }

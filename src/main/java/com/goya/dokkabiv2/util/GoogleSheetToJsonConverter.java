@@ -19,6 +19,7 @@ import java.util.List;
 @Component
 public class GoogleSheetToJsonConverter implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(GoogleSheetToJsonConverter.class);
+
     @Value("${google.sheetId}")
     private String spreadsheetId;
 
@@ -30,7 +31,13 @@ public class GoogleSheetToJsonConverter implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // 시트 데이터를 객체로 변환하고 data 폴더에 JSON 파일로 저장
+        dataPatch();
+    }
+
+    /**
+     * 시트 데이터를 JSON 파일로 변환하여 저장
+     */
+    public void dataPatch() {
         convertAndSaveSheetData("Quest", QuestData.class, "quest_data.json");
         convertAndSaveSheetData("Map", MapData.class, "map_data.json");
     }

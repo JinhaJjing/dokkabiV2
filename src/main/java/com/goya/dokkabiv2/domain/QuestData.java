@@ -6,9 +6,9 @@ import lombok.Getter;
 @Data
 @Getter
 public class QuestData {
-    public String Index;
-    public String QuestID;
-    public String QuestType;
-    public String QuestName;
-    public String QuestDesc;
+    public String index;
+    public String questID;
+    public String questType;
+    public String questName;
+    public String questDesc;
 }

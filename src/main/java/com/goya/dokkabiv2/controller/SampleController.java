@@ -1,10 +1,13 @@
 package com.goya.dokkabiv2.controller;
 
+import com.goya.dokkabiv2.docs.SampleControllerDocs;
 import com.goya.dokkabiv2.domain.Role;
 import com.goya.dokkabiv2.domain.User;
 import com.goya.dokkabiv2.service.UserService;
+import com.goya.dokkabiv2.util.GoogleSheetToJsonConverter;
 import com.goya.dokkabiv2.util.JWTToken;
 import com.goya.dokkabiv2.util.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,20 +23,37 @@ import java.io.IOException;
 import java.util.Optional;
 
 @RestController
-public class SampleController {
+public class SampleController implements SampleControllerDocs {
     private static final Logger logger = LoggerFactory.getLogger(SampleController.class);
-
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private GoogleSheetToJsonConverter googleSheetToJsonConverter;
 
+    @Override
+    @GetMapping("/data-patch")
+    public ResponseEntity<String> dataPatch() {
+        try {
+            googleSheetToJsonConverter.dataPatch();
+            return ResponseEntity.ok("데이터 패치가 완료되었습니다😄");
+        } catch (Exception e) {
+            logger.error("Error loading data", e);
+            return ResponseEntity.status(500).body("데이터 패치 중 오류 발생😫");
+        }
+    }
 
+    @Override
+    @GetMapping("/health-check")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("health check");
+    }
+
+    @Hidden
     @GetMapping("/test")
     public ResponseEntity<String> test() {
         logger.error("Test Exception occurred");
@@ -41,17 +61,20 @@ public class SampleController {
         return ResponseEntity.ok("Test endpoint working");
     }
 
+    @Hidden
     @GetMapping("/test-schema")
     public String testSchema() {
         String query = "SELECT name FROM test_table WHERE id = 1";
         return jdbcTemplate.queryForObject(query, String.class);
     }
 
+    @Hidden
     @GetMapping("/login")
     public void login(HttpServletResponse response) throws IOException {
         response.sendRedirect("/oauth2/authorization/google");
     }
 
+    @Hidden
     @GetMapping("/token")
     public ResponseEntity<JWTToken> generateToken(OAuth2AuthenticationToken authentication) {
         if (authentication == null) {
