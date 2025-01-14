@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class GoogleSheetParser {
 
-    @Value("classpath:google_spread_sheet_key2.json") // classpath에서 파일 로드
+    @Value("${GOOGLE_SHEET_CREDENTIALS_PATH}")
     private Resource credentialsResource;
 
     private Sheets sheetsService;
